@@ -1,0 +1,5 @@
+project_root: "{{ playbook_dir }}/.."
+nginx_conf_src: "{{ playbook_dir }}/files/nginx.conf"
+nginx_conf_dest: /etc/nginx/sites-available/default
+nginx_index_template: "{{ playbook_dir }}/templates/index.html.j2"
+nginx_index_dest: /usr/share/nginx/html/index.html

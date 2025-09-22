@@ -1,0 +1,9 @@
+[slave_1]
+host1 ansible_host=
+
+[slave_2]
+host2 ansible_host=
+
+[slaves:children]
+slave_1
+slave_2

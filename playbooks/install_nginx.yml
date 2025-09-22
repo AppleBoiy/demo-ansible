@@ -1,0 +1,61 @@
+- name: Setup and secure web server with NGINX
+  hosts: all
+  become: true
+
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: latest
+
+    - name: Copy NGINX configuration file
+      copy:
+        src: "{{ nginx_conf_src }}"
+        dest: "{{ nginx_conf_dest }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create symbolic link for NGINX configuration
+      file:
+        src: "{{ nginx_conf_dest }}"
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+        force: yes
+
+    - name: Deploy index.html using template
+      template:
+        src: "{{ nginx_index_template }}"
+        dest: "{{ nginx_index_dest }}"
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Ensure NGINX is running and enabled on boot
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Remove default NGINX welcome page if exists
+      file:
+        path: /usr/share/nginx/html/index.nginx-debian.html
+        state: absent
+
+    - name: Perform NGINX configuration test
+      command: nginx -t
+      register: nginx_test
+      changed_when: false
+
+    - name: Restart NGINX if configuration is valid
+      service:
+        name: nginx
+        state: restarted
+      when: nginx_test.rc == 0

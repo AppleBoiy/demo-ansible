@@ -1,0 +1,10 @@
+- name: Copy file to host(s)
+  hosts: all
+
+  vars_files:
+    - group_vars/all.yml
+  tasks:
+    - name: Copy file
+      copy:
+        src: "{{ project_root }}/files/doc.txt"
+        dest: ~/
